@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROY</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<main id="scroll">
+  <section class="spacer"></section>
+
+</main>
+
+<div id="stageWrap">
+  <div id="stage">
+
+    <canvas id="confetti"></canvas>
+    <div id="lightSweep"></div>
+    <div id="grain"></div>
+
+    <!-- SCENE 1 -->
+    <div class="scene is-active" data-scene="1">
+      <img class="bg" src="assets/s1/bg1.png" alt="Background">
+
+
+      <!-- FRAME + RESULTS -->
+      <img id="frame" src="assets/s1/frame.png" alt="Frame">
+      <div id="drawSlot"></div>
+
+      <!-- ROY -->
+      <img class="roy" src="assets/s1/Roy1.png" alt="Roy">
+    </div>
+      <div id="finalFlash"></div>
+<div id="scratchContainer">
+  <div id="scratchPrize">
+    <a id="loginX" href="#" target="_self" rel="noopener">LOGIN WITH X</a>
+  </div>
+
+  <canvas id="scratchCanvas"></canvas>
+
+
+  <div id="scratchShimmer"></div>
+
+  <img src="assets/s1/scratch.png" class="scratchFrame" alt="Scratch ticket">
+</div>
+
+
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

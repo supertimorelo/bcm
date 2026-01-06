@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BCMDAO - The Next-Gen Lottery</title>
+  <style>
+    :root{
+      --bg1:#05071a;
+      --bg2:#140a2a;
+      --bg3:#2a0d3a;
+
+      /* iPhone-ish proportions */
+      --phone-w: min(92vw, 420px);
+      --phone-h: calc(var(--phone-w) * 2.06);
+
+      --bezel: 16px;
+      --screen-radius: 44px;
+      --bezel-radius: 56px;
+
+      --glow1: rgba(120, 240, 255, .20);
+      --glow2: rgba(255, 120, 240, .18);
+      --shadow: 0 40px 120px rgba(0,0,0,.55);
+      --shadow2: 0 18px 50px rgba(0,0,0,.55);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      overflow-x:hidden;
+      background:
+        radial-gradient(1200px 900px at 25% 10%, rgba(130,180,255,.18), transparent 60%),
+        radial-gradient(1000px 800px at 75% 25%, rgba(255,150,220,.14), transparent 60%),
+        radial-gradient(900px 700px at 45% 80%, rgba(140,255,210,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2) 45%, var(--bg3));
+    }
+
+    /* subtle stars */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        radial-gradient(1px 1px at 12% 22%, rgba(255,255,255,.30) 40%, transparent 42%),
+        radial-gradient(1px 1px at 33% 18%, rgba(255,255,255,.22) 40%, transparent 42%),
+        radial-gradient(1px 1px at 72% 27%, rgba(255,255,255,.20) 40%, transparent 42%),
+        radial-gradient(1px 1px at 84% 12%, rgba(255,255,255,.18) 40%, transparent 42%),
+        radial-gradient(1px 1px at 55% 40%, rgba(255,255,255,.16) 40%, transparent 42%),
+        radial-gradient(1px 1px at 18% 65%, rgba(255,255,255,.18) 40%, transparent 42%),
+        radial-gradient(1px 1px at 66% 72%, rgba(255,255,255,.14) 40%, transparent 42%),
+        radial-gradient(1px 1px at 90% 78%, rgba(255,255,255,.12) 40%, transparent 42%);
+      opacity:.85;
+      pointer-events:none;
+      filter: blur(.2px);
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px 16px 28px;
+      position:relative;
+      z-index:1;
+    }
+
+    .content{
+      width: min(1080px, 94vw);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 22px;
+    }
+
+    .copy{
+      width: min(860px, 94vw);
+      text-align:left;
+    }
+    .copy h1{
+      margin:0;
+      font-size: clamp(22px, 4.6vw, 40px);
+      letter-spacing:.3px;
+      line-height:1.05;
+    }
+    .copy p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 62ch;
+      font-weight: 800;
+      letter-spacing:.15px;
+    }
+
+
+    .hero{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+    }
+    .hero-logo{
+      width: 66px;
+      height: 66px;
+      flex: 0 0 auto;
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      background: rgba(255,255,255,.06);
+      padding: 7px;
+      display:block;
+    }
+    .hero-text h1{ margin:0; }
+    .hero-text p{ margin: 10px 0 0; }
+
+    /* Results card */
+    .results-card{
+      position: relative;
+margin-top: 16px;
+      width: min(860px, 94vw);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.30);
+      overflow:hidden;
+    }
+    .results-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .results-title{
+      font-weight: 900;
+      letter-spacing:.2px;
+      font-size: 13px;
+      color: rgba(255,255,255,.90);
+    }
+    .live-dot{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      color: rgba(255,255,255,.70);
+      font-size: 12px;
+      font-weight: 700;
+      user-select:none;
+    }
+    .live-dot i{
+      width: 8px; height: 8px; border-radius:99px;
+      background: linear-gradient(180deg, rgba(120,240,255,.95), rgba(255,120,240,.95));
+      box-shadow: 0 0 18px rgba(120,240,255,.35);
+      display:inline-block;
+    }
+    .results-body{ padding: 10px 12px 12px; overflow: hidden; }
+
+    table.results{
+      width:100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+    }
+    table.results th, table.results td{
+      padding: 9px 4px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align:left;
+      white-space: nowrap;
+      overflow: visible;
+    }
+    table.results th{
+      color: rgba(255,255,255,.65);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing:.2px;
+      text-transform: uppercase;
+    }
+    table.results tr:last-child td{ border-bottom: none; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 34px;
+      height: 28px;
+      padding: 0;
+      border-radius: 999px;
+      font-weight: 900;
+      letter-spacing: 0;
+      font-size: 12px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+      background: rgba(255,255,255,.08);
+    }
+    .pill.green{
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), rgba(60,235,150,.38) 70%, rgba(10,150,85,.30));
+      border-color: rgba(140,255,205,.22);
+      box-shadow: 0 0 18px rgba(60,255,170,.14);
+    }
+    .pill.red{
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), rgba(255,90,110,.36) 70%, rgba(170,30,55,.26));
+      border-color: rgba(255,170,185,.20);
+      box-shadow: 0 0 18px rgba(255,90,110,.12);
+    }
+
+    table.results th.matches-col,
+    table.results td.matches-col{
+      width: 32%;
+    }
+    table.results td.matches-col{
+      color: rgba(255,255,255,.62);
+      font-weight: 800;
+      font-size: 11px;
+    }
+
+    /* Confetti explosion (canvas) */
+    .confetti-canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border-radius: inherit;
+      pointer-events:none;
+      z-index: 30;
+      mix-blend-mode: screen;
+    }
+    .results-card.is-burst{
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.32),
+        0 0 0 1px rgba(255,255,255,.18),
+        0 0 44px rgba(120,240,255,.10),
+        0 0 70px rgba(255,120,240,.08);
+      border-color: rgba(255,255,255,.22);
+    }
+    .results-card.is-burst::after{
+      content:"";
+      position:absolute;
+      left: 50%;
+      top: 44px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0) 70%);
+      filter: blur(1px);
+      opacity: 0;
+      animation: burstFlash .55s ease-out forwards;
+      pointer-events:none;
+      z-index: 25;
+    }
+    @keyframes burstFlash{
+      0%{ transform: translateX(-50%) scale(.6); opacity: 0; }
+      18%{ opacity: .95; }
+      100%{ transform: translateX(-50%) scale(7); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .confetti-canvas{ display:none; }
+      .results-card.is-burst::after{ display:none; }
+    }
+
+
+    .muted{
+      color: rgba(255,255,255,.55);
+      font-weight: 700;
+    }
+
+    /* Device stage */
+    .stage{
+      width: 100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding: 6px 0 2px;
+      perspective: 1200px;
+    }
+
+    .phone{
+      width: var(--phone-w);
+      height: var(--phone-h);
+      position:relative;
+      transform-style: preserve-3d;
+      transition: transform .18s ease;
+      filter: drop-shadow(var(--shadow));
+    }
+
+    /* outer frame */
+    .phone::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: var(--bezel-radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.20), rgba(255,255,255,.06) 35%, rgba(0,0,0,.40)),
+        radial-gradient(600px 220px at 35% 10%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(180deg, rgba(30,30,40,1), rgba(10,10,18,1));
+      box-shadow: var(--shadow2);
+    }
+
+    /* glow */
+    .phone::after{
+      content:"";
+      position:absolute;
+      inset:-16px;
+      border-radius: calc(var(--bezel-radius) + 14px);
+      background:
+        radial-gradient(260px 220px at 20% 20%, var(--glow1), transparent 60%),
+        radial-gradient(280px 240px at 75% 30%, var(--glow2), transparent 62%);
+      filter: blur(10px);
+      opacity:.9;
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    /* side buttons */
+    .btns-left, .btns-right{
+      position:absolute;
+      top: 20%;
+      width: 4px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      opacity:.9;
+      pointer-events:none;
+    }
+    .btns-left{ left: -6px; }
+    .btns-right{ right: -6px; top: 26%; }
+
+    .side{
+      height: 36px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.35));
+      box-shadow: 0 8px 14px rgba(0,0,0,.25);
+    }
+    .side.small{ height: 26px; opacity:.9; }
+
+    /* screen */
+    .screen{
+      position:absolute;
+      inset: var(--bezel);
+      border-radius: var(--screen-radius);
+      overflow:hidden;
+      background: #000;
+      transform: translateZ(1px);
+    }
+
+    /* dynamic island */
+    .island{
+      position:absolute;
+      top: calc(var(--bezel) + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44%;
+      max-width: 178px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.86);
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      z-index: 3;
+      pointer-events:none;
+    }
+    .island::before{
+      content:"";
+      position:absolute;
+      left: 12px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      transform: translateY(-50%);
+      border-radius: 99px;
+      background: rgba(120,240,255,.16);
+      box-shadow: 0 0 18px rgba(120,240,255,.16);
+    }
+    .island::after{
+      content:"";
+      position:absolute;
+      right: 12px;
+      top: 50%;
+      width: 22px;
+      height: 10px;
+      transform: translateY(-50%);
+      border-radius: 99px;
+      background: rgba(255,255,255,.08);
+    }
+
+    /* reflection */
+    .reflection{
+      position:absolute;
+      inset: 0;
+      border-radius: var(--bezel-radius);
+      background: linear-gradient(120deg, rgba(255,255,255,.20), rgba(255,255,255,0) 45%);
+      opacity:.12;
+      pointer-events:none;
+      mix-blend-mode: screen;
+      transform: translateZ(2px);
+    }
+
+    /* Mobile order: phone then results */
+    .stage{ order: 1; }
+    .left{ order: 2; }
+
+
+    @media (min-width: 920px){
+
+      .left{ order: 1; }
+      .stage{ order: 2; }
+
+      :root{ --phone-w: 420px; }
+      .wrap{ padding: 34px 22px 36px; }
+      .content{
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 44px;
+      }
+      .copy, .results-card{
+        width: 44%;
+        min-width: 360px;
+        max-width: 520px;
+      }
+      .stage{ width: auto; justify-content: flex-end; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .phone{ transition:none; }
+    }
+
+    /* ----------------- MOBILE APP (scoped) ----------------- */
+    .mobile-root{
+      height: 100%;
+      width: 100%;
+      background: url("bgmob.png") center / cover no-repeat;
+      overflow: hidden;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding: 14px 14px 18px;
+      color: rgba(255,255,255,.92);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      position: relative;
+    }
+    .mobile-root *{ box-sizing:border-box; }
+
+    .m-app{
+      width: 100%;
+      max-width: 520px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 18px;
+    }
+
+    .m-draw-stack{
+      width: min(80%, 420px);
+      margin-top: 40px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      position: relative;
+      filter: drop-shadow(0 18px 60px rgba(0,0,0,.35));
+    }
+
+    .m-roy-wrap{
+      width: 92%;
+      position: relative;
+      z-index: 1;
+      margin-bottom: -42%;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      opacity: .98;
+    }
+    .m-roy-wrap::before{
+      content:"";
+      position:absolute;
+      inset:-8%;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%),
+        linear-gradient(120deg,
+          rgba(120,240,255,0) 0%,
+          rgba(170,120,255,.42) 28%,
+          rgba(255,200,90,.30) 55%,
+          rgba(120,240,255,0) 82%,
+          rgba(120,240,255,0) 100%);
+      mix-blend-mode: screen;
+      filter: blur(10px);
+      opacity: .62;
+      animation: mRoySweep 3.6s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes mRoySweep{
+      0%   { transform: translateX(-10%) rotate(-2deg); opacity:.50; }
+      50%  { transform: translateX( 10%) rotate( 2deg); opacity:.75; }
+      100% { transform: translateX(-10%) rotate(-2deg); opacity:.50; }
+    }
+
+    .m-roy{
+      width: 100%;
+      height:auto;
+      display:block;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      filter:
+        drop-shadow(0 0 18px rgba(170,120,255,.28))
+        drop-shadow(0 0 34px rgba(255,140,220,.16));
+    }
+
+    .m-frame-wrap{
+      width: 100%;
+      position: relative;
+      z-index: 2;
+      user-select:none;
+      -webkit-user-drag:none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .m-frame-img{
+      width:100%;
+      height:auto;
+      display:block;
+      user-select:none;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+
+    .m-balls{
+      position:absolute;
+      left: 7%;
+      right: 7%;
+      top: 18%;
+      height: 42%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 6px 4px;
+      pointer-events:none;
+    }
+
+    .m-ball{
+      flex: 1 1 0;
+      aspect-ratio: 1 / 1;
+      max-width: 64px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      font-weight: 950;
+      font-size: clamp(14px, 4vw, 24px);
+      letter-spacing: .5px;
+      color: rgba(255,255,255,.96);
+      text-shadow:
+        0 2px 5px rgba(0,0,0,.38),
+        0 0 14px rgba(0,0,0,.24);
+
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(255,255,255,.72) 28%, rgba(170,150,255,.55) 56%, rgba(95,70,210,.42));
+      border: 2px solid rgba(255,255,255,.22);
+      box-shadow:
+        inset 0 3px 10px rgba(255,255,255,.22),
+        0 12px 22px rgba(0,0,0,.30);
+      position: relative;
+      overflow: hidden;
+      transform: translateZ(0);
+    }
+    .m-ball::after{
+      content:"";
+      position:absolute;
+      inset: 10%;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 10px 18px rgba(255,255,255,.10);
+      pointer-events:none;
+    }
+    .m-ball::before{
+      content:"";
+      position:absolute;
+      left: 14%;
+      top: 12%;
+      width: 52%;
+      height: 40%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
+      transform: rotate(-14deg);
+      pointer-events:none;
+      opacity:.95;
+    }
+
+    .m-ball.m-green{
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.98) 0%,
+        rgba(210,255,235,.78) 24%,
+        rgba(60,235,150,.78) 58%,
+        rgba(10,150,85,.62) 100%);
+      border-color: rgba(140,255,205,.35);
+      box-shadow:
+        inset 0 3px 10px rgba(255,255,255,.22),
+        0 12px 22px rgba(0,0,0,.30),
+        0 0 26px rgba(60,255,170,.24);
+    }
+    .m-ball.m-red{
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.98) 0%,
+        rgba(255,220,220,.78) 24%,
+        rgba(255,90,110,.72) 58%,
+        rgba(170,30,55,.58) 100%);
+      border-color: rgba(255,170,185,.32);
+      box-shadow:
+        inset 0 3px 10px rgba(255,255,255,.22),
+        0 12px 22px rgba(0,0,0,.30),
+        0 0 26px rgba(255,90,110,.22);
+    }
+
+    .m-reveal{ animation: mPop .28s ease-out; }
+    @keyframes mPop{
+      0%{ transform: scale(.92); filter: brightness(1); }
+      60%{ transform: scale(1.06); filter: brightness(1.10) saturate(1.05); }
+      100%{ transform: scale(1.0); filter: brightness(1) saturate(1); }
+    }
+
+    .m-scratch-wrap{
+      width: min(65%, 360px);
+      margin-top: 60px;
+      position: relative;
+      filter: drop-shadow(0 18px 60px rgba(0,0,0,.35));
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    .m-scratch-img{
+      width:100%;
+      height:auto;
+      display:block;
+      position: relative;
+      z-index: 3;
+      user-select:none;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+
+    /* Scratch hole mapping */
+    .m-hole{
+      position:absolute;
+      left: 11.40%;
+      top: 31.35%;
+      width: 77.85%;
+      height: 40.10%;
+      z-index: 1;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(235,235,235,.92), rgba(195,195,195,.92));
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 10px 22px rgba(0,0,0,.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px;
+      text-align:center;
+    }
+
+    .m-login{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      text-decoration:none;
+      font-weight: 900;
+      font-size: clamp(14px, 3.6vw, 20px);
+      color: rgba(30,30,30,.95);
+      background: rgba(255,255,255,.60);
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.5),
+        0 10px 18px rgba(0,0,0,.18);
+    }
+
+    .m-canvas{
+      position:absolute;
+      left: 11.40%;
+      top: 31.35%;
+      width: 77.85%;
+      height: 40.10%;
+      z-index: 2;
+      border-radius: 14px;
+      touch-action: none;
+      cursor: grab;
+    }
+    .m-canvas.is-done{
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="content">
+      <div class="left">
+        <header class="copy">
+          <div class="hero">
+            <img class="hero-logo" src="v2.png" alt="BCM logo" />
+            <div class="hero-text">
+              <h1>The Next-Gen Lottery</h1>
+              <p>Play. Win. Repeat.</p>
+            </div>
+          </div>
+        </header>
+
+        <section class="results-card" aria-label="Results">
+          <canvas class="confetti-canvas" id="confettiCanvas" aria-hidden="true"></canvas>
+          <div class="results-head">
+            <div class="results-title">(Latest draw)</div>
+            <div class="live-dot"><i></i><span id="liveStatus">waiting…</span></div>
+          </div>
+          <div class="results-body">
+            <table class="results" role="table" aria-label="Draw history">
+              <colgroup>
+                <col style="width:8%">
+                <col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%">
+                <col style="width:32%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th class="matches-col"></th>
+                  
+                </tr>
+              </thead>
+              <tbody id="resultsTbody">
+                <tr>
+                  <td class="muted">—</td>
+                  <td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="stage" aria-label="iPhone mockup">
+        <div class="phone" id="phone">
+          <div class="btns-left" aria-hidden="true">
+            <div class="side"></div>
+            <div class="side small"></div>
+            <div class="side small"></div>
+          </div>
+          <div class="btns-right" aria-hidden="true">
+            <div class="side"></div>
+          </div>
+
+          <div class="reflection" aria-hidden="true"></div>
+          <div class="screen" aria-label="Screen">
+            <!-- Inline mobile app (no iframe) -->
+            <div class="mobile-root" id="mobileRoot">
+              <main class="m-app">
+                <section class="m-draw-stack" aria-label="Draw">
+                  <div class="m-roy-wrap">
+                    <img class="m-roy" src="Roy1.png" alt="" />
+                  </div>
+
+                  <div class="m-frame-wrap" id="frameTap" role="button" aria-label="Restart draw">
+                    <img class="m-frame-img" src="frame.png" alt="" />
+                    <div class="m-balls" id="balls">
+                      <div class="m-ball" aria-label="Ball 1">-</div>
+                      <div class="m-ball" aria-label="Ball 2">-</div>
+                      <div class="m-ball" aria-label="Ball 3">-</div>
+                      <div class="m-ball" aria-label="Ball 4">-</div>
+                      <div class="m-ball" aria-label="Ball 5">-</div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="m-scratch-wrap" aria-label="Scratch & Win">
+                  <div class="m-hole">
+                    <a class="m-login" href="https://x.com" target="_blank" rel="noopener">Login with X</a>
+                  </div>
+                  <canvas class="m-canvas" id="scratchCanvas" aria-label="Scratch area"></canvas>
+                  <img class="m-scratch-img" src="scratch.png" alt="Scratch & Win" />
+                </section>
+              </main>
+            </div>
+          </div>
+          <div class="island" aria-hidden="true"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ------------------- LIVE TABLE -------------------
+    const tbody = document.getElementById('resultsTbody');
+    const liveStatus = document.getElementById('liveStatus');
+    const history = [];
+    const MAX_ROWS = 8;
+    function rowsToShow(){
+      return (window.innerWidth >= 920) ? 8 : 3;
+    }
+    window.addEventListener('resize', () => { try{ render(); }catch(e){} }, { passive:true });
+// ------------------- CONFETTI EXPLOSION (canvas) -------------------
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    class ConfettiEngine{
+      constructor(canvas){
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.dpr = Math.max(1, window.devicePixelRatio || 1);
+        this.particles = [];
+        this.running = false;
+        this.lastTs = 0;
+        this.resizeObserver = null;
+
+        this._resize = this._resize.bind(this);
+        this._tick = this._tick.bind(this);
+
+        this._attachResize();
+        this._resize();
+      }
+
+      _attachResize(){
+        const card = this.canvas.closest('.results-card');
+        if('ResizeObserver' in window && card){
+          this.resizeObserver = new ResizeObserver(() => this._resize());
+          this.resizeObserver.observe(card);
+        }else{
+          window.addEventListener('resize', this._resize, { passive:true });
+        }
+      }
+
+      _resize(){
+        const r = this.canvas.getBoundingClientRect();
+        this.dpr = Math.max(1, window.devicePixelRatio || 1);
+        this.canvas.width = Math.max(1, Math.floor(r.width * this.dpr));
+        this.canvas.height = Math.max(1, Math.floor(r.height * this.dpr));
+        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      }
+
+      burst(greens){
+        if(prefersReducedMotion) return;
+        if(!this.canvas) return;
+
+        const card = this.canvas.closest('.results-card');
+        if(card){
+          card.classList.add('is-burst');
+          setTimeout(() => card.classList.remove('is-burst'), 520);
+        }
+
+        const r = this.canvas.getBoundingClientRect();
+        const W = r.width || 520;
+        const H = r.height || 220;
+
+        // Origin: top-center of the card (a bit below header)
+        const ox = W * 0.50;
+        const oy = 46;
+
+        // Scale intensity with matches (2..5)
+        const g = Math.max(2, Math.min(5, greens));
+        const count = 120 + (g - 2) * 70; // 120..330
+
+        const palette = [
+          '#7cf0ff','#ff78f0','#8cffd2','#ffd05a','#ff5a6e',
+          '#a78bfa','#60a5fa','#34d399','#fbbf24','#fb7185'
+        ];
+
+        for(let i=0;i<count;i++){
+          const a = (-Math.PI * 0.9) + Math.random() * (Math.PI * 0.8); // mostly upward
+          const speed = 820 + Math.random() * 980 + (g-2)*120;         // punchier with more matches
+          const vx = Math.cos(a) * speed * (0.65 + Math.random()*0.55);
+          const vy = Math.sin(a) * speed * (0.75 + Math.random()*0.45);
+
+          const shapeRoll = Math.random();
+          const shape = shapeRoll < 0.55 ? 'rect' : (shapeRoll < 0.80 ? 'circle' : 'tri');
+
+          this.particles.push({
+            x: ox,
+            y: oy,
+            vx,
+            vy,
+            s: (shape === 'rect') ? (6 + Math.random()*6) : (shape === 'circle' ? (5 + Math.random()*5) : (7 + Math.random()*7)),
+            h: (shape === 'rect') ? (10 + Math.random()*12) : 0,
+            rot: Math.random() * Math.PI * 2,
+            vr: (Math.random()*2-1) * (10 + Math.random()*14),
+            g: 1400 + Math.random()*260, // gravity px/s^2
+            drag: 0.985 - Math.random()*0.01,
+            life: 1.15 + Math.random()*0.55, // seconds
+            age: 0,
+            color: palette[(Math.random()*palette.length)|0],
+            shape,
+          });
+        }
+
+        // Add a few sparkles
+        for(let i=0;i<24;i++){
+          const a = (-Math.PI * 0.95) + Math.random() * (Math.PI * 0.9);
+          const speed = 980 + Math.random()*860;
+          this.particles.push({
+            x: ox,
+            y: oy,
+            vx: Math.cos(a)*speed,
+            vy: Math.sin(a)*speed,
+            s: 2 + Math.random()*2,
+            h: 0,
+            rot: 0,
+            vr: 0,
+            g: 1200,
+            drag: 0.99,
+            life: 0.65 + Math.random()*0.25,
+            age: 0,
+            color: 'rgba(255,255,255,.95)',
+            shape: 'spark'
+          });
+        }
+
+        if(!this.running){
+          this.running = true;
+          this.lastTs = performance.now();
+          requestAnimationFrame(this._tick);
+        }
+      }
+
+      _tick(ts){
+        const ctx = this.ctx;
+        const r = this.canvas.getBoundingClientRect();
+        const W = r.width || 520;
+        const H = r.height || 220;
+
+        const dt = Math.min(0.033, (ts - this.lastTs) / 1000);
+        this.lastTs = ts;
+
+        ctx.clearRect(0,0,W,H);
+
+        const next = [];
+        for(const p of this.particles){
+          p.age += dt;
+          if(p.age >= p.life) continue;
+
+          // Integrate
+          p.vx *= Math.pow(p.drag, dt*60);
+          p.vy *= Math.pow(p.drag, dt*60);
+          p.vy += p.g * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.rot += p.vr * dt;
+
+          // Cull if well outside
+          if(p.y > H + 80 || p.x < -80 || p.x > W + 80) continue;
+
+          // Draw
+          const t = p.age / p.life; // 0..1
+          const alpha = t < 0.15 ? (t/0.15) : (t > 0.85 ? (1 - (t-0.85)/0.15) : 1);
+
+          ctx.save();
+          ctx.globalAlpha = alpha;
+
+          if(p.shape === 'spark'){
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.s, 0, Math.PI*2);
+            ctx.fill();
+            ctx.globalAlpha = alpha * 0.55;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.s*3.2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+            continue;
+          }
+
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+
+          if(p.shape === 'circle'){
+            ctx.beginPath();
+            ctx.arc(0, 0, p.s, 0, Math.PI*2);
+            ctx.fill();
+          }else if(p.shape === 'tri'){
+            const s = p.s;
+            ctx.beginPath();
+            ctx.moveTo(0, -s);
+            ctx.lineTo(s*0.9, s);
+            ctx.lineTo(-s*0.9, s);
+            ctx.closePath();
+            ctx.fill();
+          }else{
+            // rect
+            ctx.fillRect(-p.s/2, -p.h/2, p.s, p.h);
+          }
+
+          // spec highlight
+          ctx.globalAlpha = alpha * 0.25;
+          ctx.fillStyle = 'rgba(255,255,255,.9)';
+          ctx.fillRect(-p.s/2, -p.h/2, Math.max(2, p.s*0.22), Math.max(3, p.h*0.35));
+
+          ctx.restore();
+          next.push(p);
+        }
+
+        this.particles = next;
+
+        if(this.particles.length){
+          requestAnimationFrame(this._tick);
+        }else{
+          this.running = false;
+        }
+      }
+    }
+
+    const confetti = confettiCanvas ? new ConfettiEngine(confettiCanvas) : null;
+
+
+    function matchLabel(picks){
+      const greens = (picks || []).filter(x => x && x.color === 'green').length;
+      if(greens === 5) return 'Match 5';
+      if(greens === 4) return 'Match 4';
+      if(greens === 3) return 'Match 3';
+      if(greens === 2) return 'Match 2';
+      return '-';
+    }
+
+    function pillCell(p){
+      if(!p || typeof p.n !== 'number') return '<span class="muted">—</span>';
+      const c = (p.color === 'green') ? 'green' : 'red';
+      return `<span class="pill ${c}">${p.n}</span>`;
+    }
+
+    function render(){
+      if(history.length === 0){
+        tbody.innerHTML = `
+          <tr>
+            <td class="muted">—</td>
+            <td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td>
+          </tr>`;
+        return;
+      }
+      tbody.innerHTML = history.slice(0, rowsToShow()).map((row, idx) => `
+        <tr>
+          <td>${history.length - idx}</td>
+          <td>${pillCell(row.picks[0])}</td>
+          <td>${pillCell(row.picks[1])}</td>
+          <td>${pillCell(row.picks[2])}</td>
+          <td>${pillCell(row.picks[3])}</td>
+          <td>${pillCell(row.picks[4])}</td>
+          <td class="muted matches-col">${matchLabel(row.picks)}</td>
+</tr>
+      `).join('');
+    }
+
+    function pushResult(picks){
+      history.unshift({ ts: Date.now(), picks });
+      history.splice(MAX_ROWS * 2);
+      liveStatus.textContent = 'received';
+      const greens = (picks || []).filter(x => x && x.color === 'green').length;
+      if(confetti && greens >= 2){ confetti.burst(greens); }
+      render();
+    }
+
+    // ------------------- DRAW ENGINE -------------------
+    const ballEls = Array.from(document.querySelectorAll("#balls .m-ball"));
+    const frameTap = document.getElementById("frameTap");
+
+    const AUTO_RESTART_MS = 2500;
+    let drawTimer = null;
+    let isDrawing = false;
+
+    function uniqueRandomInts(count, min, max){
+      const set = new Set();
+      while(set.size < count){
+        const n = Math.floor(Math.random() * (max - min + 1)) + min;
+        set.add(n);
+      }
+      return Array.from(set);
+    }
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function randomColor(){ return (Math.random() < 0.5) ? "green" : "red"; }
+
+    function resetBalls(){
+      ballEls.forEach(b => {
+        b.textContent = "-";
+        b.classList.remove("m-reveal","m-green","m-red");
+      });
+    }
+
+    async function runDrawOnce(){
+      if(isDrawing) return;
+      isDrawing = true;
+
+      try{
+        resetBalls();
+        await sleep(220);
+
+        const picksNums = uniqueRandomInts(5, 1, 50);
+        const picks = [];
+
+        for(let i=0;i<5;i++){
+          const color = randomColor();
+          const b = ballEls[i];
+
+          b.classList.remove("m-green","m-red");
+          b.classList.add(color === "green" ? "m-green" : "m-red");
+
+          picks[i] = { n: picksNums[i], color };
+
+          b.textContent = String(picksNums[i]);
+          b.classList.remove("m-reveal");
+          void b.offsetWidth;
+          b.classList.add("m-reveal");
+
+          await sleep(650);
+        }
+
+        pushResult(picks);
+
+      }catch(err){
+        console.error("Draw error:", err);
+      }finally{
+        isDrawing = false;
+        clearTimeout(drawTimer);
+        drawTimer = setTimeout(() => { runDrawOnce(); }, AUTO_RESTART_MS);
+      }
+    }
+
+    function restartDrawNow(){
+      clearTimeout(drawTimer);
+      isDrawing = false;
+      runDrawOnce();
+    }
+
+    frameTap.addEventListener("click", restartDrawNow);
+    runDrawOnce();
+
+    // ------------------- SCRATCH -------------------
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    let isDown = false;
+    let last = null;
+    let brushRadius = 22;
+    let checkTimer = null;
+    let done = false;
+
+    function resizeCanvasAndPaint(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      paintGold(rect.width, rect.height);
+
+      brushRadius = Math.max(18, Math.min(rect.width, rect.height) * 0.18);
+      done = false;
+      canvas.classList.remove("is-done");
+      canvas.style.pointerEvents = "auto";
+    }
+
+    function paintGold(w, h){
+      ctx.globalCompositeOperation = "source-over";
+      ctx.clearRect(0,0,w,h);
+
+      const g = ctx.createLinearGradient(0,0,w,h);
+      g.addColorStop(0.00, "rgba(255, 233, 150, 0.98)");
+      g.addColorStop(0.25, "rgba(255, 200, 80, 0.98)");
+      g.addColorStop(0.55, "rgba(255, 240, 170, 0.98)");
+      g.addColorStop(0.80, "rgba(220, 160, 60, 0.98)");
+      g.addColorStop(1.00, "rgba(255, 220, 120, 0.98)");
+
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,w,h);
+
+      for(let i=0;i<350;i++){
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const r = Math.random() * 1.6 + 0.4;
+        const a = Math.random() * 0.22;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,255,255,${a})`;
+        ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.ellipse(w*0.25, h*0.25, w*0.55, h*0.28, -0.35, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top, w: rect.width, h: rect.height };
+    }
+
+    function scratchTo(x, y){
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, brushRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function scratchLine(a, b){
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = brushRadius * 2;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+
+    function scheduleCheck(w,h){
+      if(done) return;
+      if(checkTimer) return;
+      checkTimer = setTimeout(() => {
+        checkTimer = null;
+        tryFinish(w,h);
+      }, 240);
+    }
+
+    function tryFinish(w,h){
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const img = ctx.getImageData(0,0,Math.floor(w*dpr), Math.floor(h*dpr)).data;
+
+      let cleared = 0;
+      const step = 24;
+      for(let i=3;i<img.length;i+=step){
+        if(img[i] === 0) cleared++;
+      }
+      const sampledTotal = Math.floor(img.length/step);
+      const ratio = cleared / sampledTotal;
+
+      if(ratio > 0.55){
+        done = true;
+        canvas.classList.add("is-done");
+        canvas.style.pointerEvents = "none";
+      }
+    }
+
+    function onDown(e){
+      if(done) return;
+      isDown = true;
+      last = getPos(e);
+      scratchTo(last.x, last.y);
+      scheduleCheck(last.w, last.h);
+      canvas.style.cursor = "grabbing";
+      e.preventDefault();
+    }
+
+    function onMove(e){
+      if(!isDown || done) return;
+      const p = getPos(e);
+      if(last){ scratchLine(last, p); }
+      else{ scratchTo(p.x, p.y); }
+      last = p;
+      scheduleCheck(p.w, p.h);
+      e.preventDefault();
+    }
+
+    function onUp(){
+      isDown = false;
+      last = null;
+      canvas.style.cursor = "grab";
+    }
+
+    canvas.addEventListener("pointerdown", onDown);
+    canvas.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+
+    const ro = new ResizeObserver(() => resizeCanvasAndPaint());
+    ro.observe(canvas);
+    window.addEventListener("load", resizeCanvasAndPaint);
+
+    // ------------------- TILT -------------------
+    const phone = document.getElementById('phone');
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+    if(!reduce && finePointer){
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      window.addEventListener('mousemove', (e) => {
+        const r = phone.getBoundingClientRect();
+        const x = (e.clientX - (r.left + r.width/2)) / (r.width/2);
+        const y = (e.clientY - (r.top + r.height/2)) / (r.height/2);
+        const rx = clamp(-y * 6, -7, 7);
+        const ry = clamp(x * 8, -9, 9);
+        phone.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+      }, { passive:true });
+      window.addEventListener('mouseleave', () => {
+        phone.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      });
+    }
+  </script>
+</body>
+</html>
